@@ -97,9 +97,8 @@ class Login(tk.Frame):
 		#__init__(self, parent, controller)
 		found_user = False
 		for user in bj.users:
-			if (str(self.username.get()) != user.full_name) or (int(self.identity.get()) != user.id) :
-				print(str(self.username.get())+" Is incorrect ["+str((int(self.identity.get()))) +":"+str(user.id)+"]")
-			else:
+			if (str(self.username.get()) == user.full_name) and (int(self.identity.get()) == user.id) :
+				# Put Something Here
 				# Detail inputted is correct.
 				found_user =True
 				n = int(self.identity.get())
@@ -120,6 +119,7 @@ class Login(tk.Frame):
 				self.back_home = tk.Button(self, text="Back to Home", 
 											command=lambda:self.controller.display_window(MainMenu))
 				self.back_home.pack(side="left")
+				
 		if found_user == False:
 			tkinter.messagebox.showinfo('Window Title', "Incorrect User or Pin.")
 
@@ -250,8 +250,20 @@ class CreateAccount(tk.Frame):
 		self.back_home.pack(side="left")
 
 	def go(self):
-		self.auto_id = randint(0,1000)
+		bj.run_through_users()
+		random = randint(0,1000)
+		test = bj.check_if_unique(random)
+		while test == False:
+			random = randint(0,1000)
+			test = bj.check_if_unique(random)
+		self.auto_id = random
+		print("Your Id Is:: "+str(self.auto_id))
+		user_id = "Your Personal Id is: "+str(self.auto_id)
+		
+		print("User is")
+		tkinter.messagebox.showinfo('Your ID, Remember this', user_id)
 		bj.create_account(int(self.auto_id), self.username.get(), float(self.balance.get()))
+
 		
 #prime id_er
 
@@ -262,7 +274,12 @@ class ExitSystem(tk.Frame):
 		label = tk.Label(self, text="Goodbye!", font=LARGE_FONT)
 		label.pack(pady=12, padx=12)
 
-
-
+bj.get_user_details()
+bj.sort_by_id()
+bj.get_id_started()
 app = BigBossGui()
+app.title("Bank Jama")
+app.minsize(width=400, height=400)
+app.maxsize(width=800, height=800)
+
 app.mainloop()
