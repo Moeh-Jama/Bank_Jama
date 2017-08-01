@@ -1,86 +1,39 @@
 from account import Account
 from random import randint
 import math
-#import string
+import user_database as ud
+import jama_search as js
 users = []
-auto_id = 000
 user_identities = []
-new_ids = []
-def get_id_started():
-	for n in users:
-		new_ids.append(n.id)
+current_user =  [] 
 def create_account(auto_id, username, cash):
+	""" User is created and appended to users array and 
+	added to csv file """
 	id_number = auto_id
 	print("Your Id is: " + str(id_number))
 	full_name = username.title()
 	balance = float(cash)
-	new_user = Account(id_number, full_name.title(), float(balance))
+	e_split =username.split()
+	email = e_split[0].title()+'-'+e_split[1].title()+'@moemail.com'
+	new_user = Account(id_number, full_name.title(), float(balance), email)
 	print("Full Name: "+full_name.title())
 	users.append(new_user)
-	save_user_details_database(users[-1])
+	ud.save_user_details_database(new_user, 'a', users)
 
-def get_user_details():
-	""" When Program is run, user details are withdrawn from a csv file."""
-	filename = 'userdata.csv'
-	with open(filename, 'r') as f_obj:
-		lines = f_obj.readlines()
-		for line in lines:
-			#print(line.split())
-			take = line.split()
-			gu_identity = int(take[0])
-			gu_name = take[1].replace('_', ' ')
-			gu_balance = float(take[2])
-			new_user = Account(gu_identity, gu_name.title(), float(gu_balance))
-			users.append(new_user)
-			#run_through_users()
-
-
-def run_through_users():
-	for user in users:
-		print(user.full_name +' '+ str(user.id) +' '+ str(user.balance))
-		
-
-def sort_through_ids(identity):
-	""" Sort users by their Id's"""
-	run_through_users()
-	print("Begining to Sort")
-	#print(user_identities[:])
-	new_ids.sort()
-	half = math.ceil(len(new_ids) / 2)
-	"""print(half)
-	print(new_ids[half])"""
-	# Divide and Conquer.
-	print(identity)
-	print(new_ids[half])
-	if new_ids[half] < identity:
-		iterator = half
-		while iterator < len(new_ids):
-			if new_ids[iterator] == identity:
-				print("Found Iterator at "+str(iterator))
-				return iterator
-			iterator +=1
-	elif new_ids[half] > identity:
-		iterator = half
-		while iterator >= 0:
-			if new_ids[iterator] == identity:
-				print(iterator)
-				return iterator
-			iterator -=1
-	else:
-		print("Could Not find the number!")
-		return -1
-
-def sort_by_id():
-	print("Begin Sort by Id Right NOW")
-	users.sort(key=lambda x: x.id, reverse=False)
-	#print(users)
-
+def get_current_user():
+	return current_user[-1]
+def set_current_user(user):
+	current_user.append(user)
 def loop_through_users(identity, options, amount):
+	""" This function is used to find the user, their choice of 
+		program function (deposit, get balance or withdraw cash)
+	"""
 	print("Looping Through Users.")
-	get_user_details()
+	#get_user_details()
 	user_found = False
 	print("Looking for personal Identity: "+str(identity))
-	search_result = sort_through_ids(identity)
+	search_result = js.sort_through_ids(identity, users)
+	# If we found a user then continue with the operations.
 	if search_result != (-1):
 		print("User is found at index: "+ str(search_result))
 		user_found = True
@@ -98,51 +51,27 @@ def loop_through_users(identity, options, amount):
 			withdraw_amount = amount
 			print("User Withdrawing : "+str(withdraw_amount))
 			user.withdraw(float(withdraw_amount))
-	else:
+	if user_found == False:
 		print("Could Not Find the User!")
+	ud.save_user_details_database(users,'w', users)
 
-def get_names():
-	""" Creating Fake Users. """
-	filename = 'names.txt'
-	with open(filename, 'r') as f_obj:
-		lines = f_obj.readlines()
 
-		for line in lines:
-			#print(line.split())
-			names_split = line.split()
-			full_name = str(names_split[0] +' '+ names_split[1])
-			balance = randint(0, 1000000)
-			if len(user_identities) == 0:
-				identity = randint(0,1000)
-				user_identities.append(identity)
-			else:
-				random = randint(0,1000)
-				test = check_if_unique(random)
-				while test == False:
-					random = randint(0,1000)
-					test = check_if_unique(random)
-				user_identities.append(random)
-				identity = random
-			create_account(int(identity), str(full_name), float(balance))
 def check_if_unique(number):
 	"""Check if the Id to be given is Unique or not. """
-	# Mabye make the user_identities sorted and use
-	# Divide and Conquer methodology.
 	isUnique = True
 	for num in user_identities:
 		if num == number:
 			isUnique= False
 	return isUnique
-def save_user_details_database(user):
-	""" Implemented in the Create Account Use Case """
-	filename = 'userdata.csv'
-	with open(filename, 'a') as f_obj:
-		name = user.full_name.replace(' ', '_')
-		#name.
-		balance = user.balance
-		personal_id = user.id
-		#user_detail = []
-		user_detail = str(personal_id)+' '+ name + ' '+str(balance)+'\n'
-		f_obj.write(user_detail)
-		f_obj.close()
-#get_names()
+
+
+
+""" Creating temporary Users """
+ud.get_names(users)
+"""
+users = ud.get_user_details()
+print(users[0].full_name)
+users = js.sort_by_id(users)
+index = js.sort_through_ids(165, users)
+print(users[index].full_name)
+"""
