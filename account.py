@@ -1,5 +1,5 @@
 class Account():
-
+	""" Account object class of users properties """
 	def __init__(self, id, full_name, balance, email):
 		self.id = id
 		self.full_name = full_name

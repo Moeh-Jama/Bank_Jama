@@ -43,4 +43,5 @@ def sort_by_id(users):
 	""" Sort users array by id."""
 	print("Begin Sort by Id Right NOW")
 	users.sort(key=lambda x: x.id, reverse=False)
+	print("Sort completed.")
 	return users

@@ -18,7 +18,7 @@ def create_account(auto_id, username, cash):
 	new_user = Account(id_number, full_name.title(), float(balance), email)
 	print("Full Name: "+full_name.title())
 	users.append(new_user)
-	ud.save_user_details_database(new_user, 'a', users)
+	ud.customer_enter_database(new_user, users)
 
 def get_current_user():
 	return current_user[-1]
@@ -46,14 +46,15 @@ def loop_through_users(identity, options, amount):
 			deposit_amount = amount
 			print("User deposited: "+str(deposit_amount))
 			user.deposit(float(deposit_amount))
+			ud.update_customer_balance(user, float(+amount))
 		elif(options == 2):
 			print('Withdraw Section')
 			withdraw_amount = amount
 			print("User Withdrawing : "+str(withdraw_amount))
 			user.withdraw(float(withdraw_amount))
+			ud.update_customer_balance(user, float(-amount))
 	if user_found == False:
 		print("Could Not Find the User!")
-	ud.save_user_details_database(users,'w', users)
 
 
 def check_if_unique(number):
@@ -67,7 +68,7 @@ def check_if_unique(number):
 
 
 """ Creating temporary Users """
-ud.get_names(users)
+#ud.get_names(users)
 """
 users = ud.get_user_details()
 print(users[0].full_name)
